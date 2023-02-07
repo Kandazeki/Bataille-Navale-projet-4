@@ -2,28 +2,35 @@
 
 # je crée une classe 'Ship'
 class Ship :
-    # j'initialise le bateau en donnant son nom, sa taille, son arme (et le nombre de fois qu'on peut l'utiliser)
-    # et son état
-    def __init__(self, name, size, weapon, number_of_use, state):
+    # j'initialise le bateau en donnant son nom, sa taille, 
+    # son arme (et le nombre de fois qu'on peut l'utiliser) et son état
+    def __init__(self, name, size, weapon, number_of_use = 0):
         self.name = name
         self.size = size
         self.weapon = weapon
         self.NumberOfUse = number_of_use
-        self.state = state
+        self.life = self.size
 
     # je diminue de 1 la taille du bateau donc sa vie
     def touched (self):
-        self.size = self.size - 1
+        self.life = self.life - 1
 
     # j'augmente de 1 le nombre d'utilisation
-    def UseWeapon (self):
-        self.NumberOfUse = self.NumberOfUse + 1
-        
+    def useWeapon (self):
+        self.NumberOfUse = self.NumberOfUse - 1
+    
+    # je teste si le bateau est détruit
+    def isShipDestroyed(self):
+        if self.life == 0 :
+            print ("votre", self.name, "a été détruit !")
+            return True
+        else :
+            return False
 
 # Je crée 3 objets grâce à la classe ship
-Thousand_Sunny = Ship ("Sunny", 3, "coup de burst", 0, "alive")
-Vogue_Merry = Ship ("Merry", 2, "barrel", 0, "alive")
-Moby_Dick = Ship ("Moby Dick", 5, None, 0, "alive")
+Thousand_Sunny = Ship ("Sunny", 3, "coup de burst", 3)
+Vogue_Merry = Ship ("Merry", 2, "barrel", 2)
+Moby_Dick = Ship ("Moby Dick", 5, None)
 
 print (Thousand_Sunny.name, Thousand_Sunny.weapon)
 print (Vogue_Merry.name, Vogue_Merry.weapon)
@@ -32,19 +39,11 @@ print (Moby_Dick.name)
 #je teste la fonction 'touched'
 Thousand_Sunny.touched ()
 
-print (Thousand_Sunny.size)
-
-# fonction pour vérifier si un bateau est détruit
-def ShipDestroyed (ship):
-    if ship.size == 0 :
-        print ("votre", ship.name, "a été détruit !")
-        ship.state = "destroyed"
-    else :
-        pass
+print (Thousand_Sunny.life)
 
 # J'enlève les 2 vies du voque merry pour tester la fonction
 Vogue_Merry.touched ()
 Vogue_Merry.touched ()
 
-ShipDestroyed (Vogue_Merry)
-ShipDestroyed(Moby_Dick)
+Vogue_Merry.isShipDestroyed()
+Moby_Dick.isShipDestroyed()
