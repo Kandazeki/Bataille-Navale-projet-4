@@ -11,7 +11,7 @@ class Ship :
         self.NumberOfUse = number_of_use
         self.life = self.size
 
-    # je diminue de 1 la vie du bateau
+    # je diminue de 1 la vie du bateau si il est touché
     def touched (self):
         self.life = self.life - 1
 
@@ -41,6 +41,9 @@ class Ship :
 Thousand_Sunny = Ship ("Sunny", 3, "coup de burst", 3)
 Vogue_Merry = Ship ("Merry", 2, "barrel", 2)
 Moby_Dick = Ship ("Moby Dick", 5, None)
+Thousand_Sunny_ennemi = Ship ("Sunny", 3, "coup de burst", 3)
+Vogue_Merry_ennemi = Ship ("Merry", 2, "barrel", 2)
+Moby_Dick_ennemi = Ship ("Moby Dick", 5, None)
 
 #je teste la fonction 'touched'
 Thousand_Sunny.touched ()
@@ -62,6 +65,26 @@ Thousand_Sunny.useWeapon()
 print ("il vous reste", Thousand_Sunny.NumberOfUse, 'munition')
 Thousand_Sunny.useWeapon()
 print ("il vous reste", Thousand_Sunny.NumberOfUse, 'munition')
+
+# je teste si une des équipes a gagné ou pas encore
+def IsGameOver():
+        if Thousand_Sunny.life == 0 and Vogue_Merry.life == 0 and Moby_Dick.life == 0 :
+            print ("\nvous avez perdu l'équipe ennemie vous a anéanti")
+            print ('------------------------------------------------------------------------------------------------------------')
+            return True
+        elif Thousand_Sunny_ennemi.life == 0 and Vogue_Merry_ennemi.life == 0 and Moby_Dick_ennemi.life == 0 :
+            print ("\nVous avez gagné l'équipe ennemie a été défaite !")
+            print ('-----------------------------------------------------------------------------------------------------')
+            return True
+        else :
+            return False
+
+# je teste si ma fonction 'isgameover' marche
+while Moby_Dick.isShipDestroyed() == False :
+    Moby_Dick.touched ()
+while Thousand_Sunny.isShipDestroyed () == False :
+    Thousand_Sunny.touched ()
+IsGameOver ()
 
 print("\n\nBonjour comme tu l'as vu j'ai un peu avancé cependant mon code n'est pas vraiment utilisable pour le moment"\
       +" il faudrait en effet avancer dans l'interface graphique avant d'aller plus loin "\
