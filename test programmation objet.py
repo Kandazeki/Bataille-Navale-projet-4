@@ -17,8 +17,11 @@ class Ship :
 
     # j'augmente de 1 le nombre d'utilisation
     def useWeapon (self):
-        self.NumberOfUse = self.NumberOfUse - 1
-    
+        if self.IsAbleToUseWeapon() == True :
+            self.NumberOfUse = self.NumberOfUse - 1
+        else :
+            print ("Vous ne pouvez pas utiliser votre arme")
+
     # je teste si le bateau est détruit
     def isShipDestroyed(self):
         if self.life == 0 :
@@ -26,6 +29,13 @@ class Ship :
             return True
         else :
             return False
+    
+    #on teste si le bateai peut utiliser son arme
+    def IsAbleToUseWeapon (self):
+        if self.NumberOfUse <= 0 or self.life == 0 :
+            return False
+        else :
+            return True
 
 # Je crée 3 objets grâce à la classe ship
 Thousand_Sunny = Ship ("Sunny", 3, "coup de burst", 3)
@@ -47,3 +57,12 @@ Vogue_Merry.touched ()
 
 Vogue_Merry.isShipDestroyed()
 Moby_Dick.isShipDestroyed()
+
+Thousand_Sunny.useWeapon()
+print ("il vous reste", Thousand_Sunny.NumberOfUse, 'munitions')
+Thousand_Sunny.useWeapon()
+Thousand_Sunny.useWeapon()
+print (Thousand_Sunny.NumberOfUse)
+Thousand_Sunny.useWeapon
+print (Thousand_Sunny.NumberOfUse)
+print(Thousand_Sunny.useWeapon)
