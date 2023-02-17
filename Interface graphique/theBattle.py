@@ -16,7 +16,7 @@ class Window(QMainWindow):
 
         self.grid_player = QGridLayout()
         self.grid_computer = QGridLayout()
-        grid_center = QHBoxLayout()
+        grid_center = QVBoxLayout()
 
         self.gridSize = 15
         self.activeShip = ''
@@ -40,7 +40,7 @@ class Window(QMainWindow):
                 button = QPushButton("")
                 button.setStyleSheet(self.styleBlocks)
                 # on va écouter le clic ici sur les boutons pour lancer les attaques
-                #button.clicked.connect(lambda checked, x=x, y=y: self.button_clicked(x, y))
+                # button.clicked.connect(lambda checked, x=x, y=y: self.button_clicked(x, y))
                 button.state = False
                 button.ship = 0
                 self.grid_computer.addWidget(button, x, y)
@@ -48,10 +48,12 @@ class Window(QMainWindow):
             self.buttons_enemy.append(row)
         
         title_player = QLabel("Votre flotte :")
-        title_center = QLabel("        Placez vos bateaux")
+        title_center = QLabel("  Placez vos bateaux")
+        button_start = QPushButton("Commencer la bataille")
         title_center.setStyleSheet("background-color: lightGrey;")
         title_computer = QLabel("La flotte ennemie")
         grid_center.addWidget(title_center)
+        grid_center.addWidget(button_start)
         
         # PLAYER
         frame_player = QFrame()
@@ -186,26 +188,26 @@ class Window(QMainWindow):
 Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
 Vogue_Merry = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
 Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
-Toto = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
+Queen_Mama_Chanter = Ship(4, "Queen Mama Chanter", 7, "brown", "white", "T", None)
 
 # les méchants
 Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
 Vogue_Merry_enemy = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
 Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
-Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
+Queen_Mama_Chanter_enemy = Ship(4, "Queen Mama Chanter", 7, "brown", "white", "T", None)
 
 Ships = [
     {'id': 1, 'name': 'Moby_Dick'}, 
     {'id': 2, 'name': 'Vogue_Merry'},
     {'id': 3, 'name': 'Thousand_Sunny'},
-    {'id': 4, 'name': 'Toto'}
+    {'id': 4, 'name': 'Queen_Mama_Chanter'}
 ]
 
 Ships_enemy= [
     {'id': 1, 'name': 'Moby_Dick_enemy'}, 
     {'id': 2, 'name': 'Vogue_Merry_enemy'},
     {'id': 3, 'name': 'Thousand_Sunny_enemy'},
-    {'id': 4, 'name': 'Toto_enemy'}
+    {'id': 4, 'name': 'Queen_Mama_Chanter_enemy'}
 ]
 
 app = QApplication(sys.argv)
