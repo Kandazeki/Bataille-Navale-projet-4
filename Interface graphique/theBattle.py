@@ -94,6 +94,7 @@ class Window(QMainWindow):
             self.displayShipPlayer(object, self.gridSize+i, selected)
             i = i + 1 
 
+        # les bateaux ennemis
         for ship in Ships_enemy:
             self.isPositionned = False
             while (self.isPositionned == False):
