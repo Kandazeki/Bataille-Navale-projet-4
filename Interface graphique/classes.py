@@ -1,13 +1,11 @@
 class Ship :
     # j'initialise le bateau en donnant son nom, sa taille, 
     # son arme, le nombre de fois qu'on peut l'utiliser et ses points de vie
-    def __init__(self, id, name, size, color, textColor, symbol, weapon, number_of_use = 0):
+    def __init__(self, id, name, size, color, weapon, number_of_use = 0):
         self.id = id
         self.name = name
         self.size = size
         self.color = color
-        self.textColor = textColor
-        self.symbol = symbol
         self.weapon = weapon
         self.position = []
         self.alignement = 'H'
