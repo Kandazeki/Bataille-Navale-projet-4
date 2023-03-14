@@ -22,14 +22,15 @@ class Window(QMainWindow):
         self.activeShip = ''
         self.styleBlocks = "background-color: #f4f4f4;"
 
+        # game parameters
         self.isReadyToPlay = False
         self.isBattleStarted = False
         self.isSinkingBoat = False
-        self.memoX = 0
-        self.memoY = 0
-        self.numberOfTouched = 0
-        self.numberOfMiss = 0
-
+        self.memoX = 100
+        self.memoY = 100
+        self.isXactive = True
+        self.iteration = 1
+        self.direction = 1
         self.activeWeapon = 0
 
         for x in range(self.gridSize):
@@ -51,7 +52,7 @@ class Window(QMainWindow):
                 button = QPushButton("")
                 button.setStyleSheet(self.styleBlocks)
                 # on va écouter le clic ici sur les boutons pour lancer les attaques
-                button.clicked.connect(lambda checked, x=x, y=y: self.fight(x, y))
+                button.clicked.connect(lambda checked, x=x, y=y: self.fight(x, y, True))
                 button.state = False
                 button.ship = 0
                 button.isPlayed = False
@@ -81,7 +82,7 @@ class Window(QMainWindow):
 
         # CENTER
         frame_center = QFrame()
-        frame_center.setFixedSize(100, 600)
+        frame_center.setFixedSize(200, 600)
         frame_center.setLayout(self.grid_center)
 
         # COMPUTER
@@ -122,47 +123,89 @@ class Window(QMainWindow):
                 self.btnGridSelected(x, y, myShip, True)
 
     def choosePlaceToFight(self):
-        x = random.randint(1, self.gridSize-1)
-        y = random.randint(1, self.gridSize-1)
         if self.isSinkingBoat == True:
-            adjacent_position = self.get_adjacent_positions()
-            for position in adjacent_position :
-                if self.buttons[x][y] != True :
-                    self.fight (x, y, True)
-        if self.buttons[x][y].isPlayed != True:
-            self.fight(x, y, True)
+            self.precisionFight()
+        else:    
+            x = random.randint(0, self.gridSize-1)
+            y = random.randint(0, self.gridSize-1)
+
+            if self.buttons[x][y].isPlayed != True:
+                self.fight(x, y, False)
+            else:
+                print('déjà touché ',x, y)
+                self.choosePlaceToFight()
+
+    def precisionFight(self):
+        print("tir de précision")
+        if self.isXactive == True:
+            print('isXactive ', self.isXactive)
+            print(self.memoX, self.iteration, self.direction)
+            x = self.calcNewPosition(self.memoX)
+            y = self.memoY
         else:
-            print('déjà touché ',x, y)
-            self.choosePlaceToFight()
+            x = self.memoX
+            y = self.calcNewPosition(self.memoY)
 
-    def get_adjacent_positions(self):
-        adjacent_positions = [(self.memoX+1, self.memoY), (self.memoX-1, self.memoY), (self.memoX, self.memoY+1), (self.memoX, self.memoY-1)]
-        return adjacent_positions
+        print('nouvelles coordonnées : ', x, y, self.iteration)
+        self.iteration = self.iteration + 1
+        self.fight(x, y, False)
 
-    def fight(self, x, y, friend = False):
-        button = self.buttons_enemy[x][y] if friend == False else self.buttons[x][y]
+    def calcNewPosition(self, memo):
+        xy = memo + (self.iteration * self.direction)
+        print('new xy = ', xy)
+        print('gridSize = ', self.gridSize)
+        if xy >= self.gridSize:
+            self.direction = -1
+            self.iteration = 1
+            print('attention on risque de quitter la grille')
+            xy = self.calcNewPosition(memo)
+        if xy < 0:
+            self.direction = 1
+            self.iteration = 1
+            self.isXactive = False
+            xy = self.calcNewPosition(memo)
+        return xy
+
+    def fight(self, x, y, playingOnEnemyGrid = True):
+        button = self.buttons_enemy[x][y] if playingOnEnemyGrid == True else self.buttons[x][y]
         button.isPlayed = True
+
         if self.isBattleStarted:
             if button.state == True :
                 print ("touché ", button.ship)
-                if friend == True:
+                if playingOnEnemyGrid == False:
+                    print('bateau ami touché : ', self.iteration)
                     self.isSinkingBoat = True
-                    self.memoX = x
-                    self.memoY = y
-                    self.numberOfTouched =+ 1
+                    if self.memoX == 100:
+                        self.memoX = x
+                        self.memoY = y
                 button.setStyleSheet("background-color: red")
                 for ship in Ships_enemy :
                     if ship['id'] == button.ship :
                         ship_name = globals()[ship['name']]
                 ship_name.touched ()
                 ship_name.isShipDestroyed ()
+                if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
+                   self.isSinkingBoat = False 
+                   self.memoX = 100
+                   self.memoY = 100
+                   self.direction = 1
+                   self.iteration = 1
+                   self.isXactive = True
             else :
-                if friend == True and self.isSinkingBoat == True :
-                    self.numberOfMiss =+ 1
                 print ("à l'eau")
                 button.setStyleSheet("background-color: blue")
+                if playingOnEnemyGrid == False and self.isSinkingBoat == True:
+                    if self.direction == 1:
+                        self.iteration = 1
+                        self.direction = -1
+                    else:
+                        self.isXactive = False
+                        self.iteration = 1
+                        self.direction = 1
+                    
             print('attaque ', x, y)
-            if friend == False:
+            if (playingOnEnemyGrid == True):
                 self.choosePlaceToFight()
         else:
             print('placez vos bateaux !!!')
@@ -182,7 +225,7 @@ class Window(QMainWindow):
         selector = ""
         globals()[selector] = shipSelector
         selector = QRadioButton(f"{Ship.name} ({Ship.size})")
-        selector.setStyleSheet(f"background-color: {Ship.color}; padding: 3px;")
+        selector.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
         selector.setAccessibleName(str(Ship.id))
         selector.setChecked(isSelected)
         check_box = QCheckBox("Vertical")
@@ -240,6 +283,7 @@ class Window(QMainWindow):
         ready = True
         for x in Ships:
             ship = globals()[x['name']]
+            print (ship.position)
             if not ship.position: 
                 ready = False 
         if ready == True:
@@ -254,8 +298,9 @@ class Window(QMainWindow):
         button = buttons[x][y]
         button.state = True
         button.ship = Ship.id
-        if isEnemy == False or DEBUG == True :
-            button.setStyleSheet(f"background-color: {Ship.color}; padding: 3px;")
+        if (isEnemy == False) or (DEBUG == True ):
+            button.setText(Ship.symbol)
+            button.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
         
     def removeShipFromGrid(self, id):
         for x in range(self.gridSize):
@@ -273,16 +318,16 @@ class Window(QMainWindow):
         self.btnGridSelected(x, y, ship)
         
 # les gentils
-Moby_Dick = Ship (1, "Moby Dick", 5, "green", None)
-Vogue_Merry = Ship (2, "Merry", 2, "blue", "barrel", 2)
-Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "coup de burst", 3)
-Toto = Ship(4, "Toto le bateau", 7, "brown", None)
+Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
+Vogue_Merry = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
+Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
+Toto = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
 
 # les méchants
-Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "green", None)
-Vogue_Merry_enemy = Ship (2, "Merry", 2, "blue", "barrel", 2)
-Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "coup de burst", 3)
-Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", None)
+Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
+Vogue_Merry_enemy = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
+Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
+Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
 
 Ships = [
     {'id': 1, 'name': 'Moby_Dick'}, 
