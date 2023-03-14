@@ -29,7 +29,6 @@ class Ship :
     # je teste si le bateau est détruit
     def isShipDestroyed(self):
         if self.life == 0 :
-            print ("votre", self.name, "a été détruit !")
             return True
         else :
             return False
