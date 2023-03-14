@@ -200,15 +200,14 @@ class Window(QMainWindow):
             self.IsGameOver ()
         else:
             print('placez vos bateaux !!!')
-'''
+
     def IsGameOver (self):
         numberOfShipDestroyed = 0
         for ship in Ships :
             ship_name = globals()[ship['name']]
+            print (ship_name.name)
             if ship_name.isShipDestroyed () == True :
-                numberOfShipDestroyed = numberOfShipDestroyed + 1
-
-                print ('HELLO')
+                numberOfShipDestroyed = numberOfShipDestroyed + 1   
         if numberOfShipDestroyed == len (Ships) :
                 print ("Vous avez perdu")
         numberOfShipEnnemyDestroyed = 0
@@ -218,7 +217,7 @@ class Window(QMainWindow):
                 numberOfShipEnnemyDestroyed = numberOfShipEnnemyDestroyed + 1
         if numberOfShipEnnemyDestroyed == len (Ships_enemy) :
             print ("Vous avez gagné !")
-'''
+
     def startBattle(self):
         if self.isReadyToPlay:
             self.isBattleStarted = True
