@@ -158,7 +158,7 @@ class Window(QMainWindow):
             xy = self.calcNewPosition(memo)
         return xy
 
-    def fight(self, x, y, playingOnEnemyGrid = True):
+    def fight (self, x, y, playingOnEnemyGrid = True):
         button = self.buttons_enemy[x][y] if playingOnEnemyGrid == True else self.buttons[x][y]
         button.isPlayed = True
         if self.isBattleStarted:
@@ -176,6 +176,7 @@ class Window(QMainWindow):
                 ship_name.touched ()
                 if ship_name.isShipDestroyed () == True :
                     print ("le", ship_name.name, "a été détruit")
+                    self.IsGameWon ()
                 if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
                    self.isSinkingBoat = False 
                    self.memoX = 100
@@ -183,6 +184,7 @@ class Window(QMainWindow):
                    self.direction = 1
                    self.iteration = 1
                    self.isXactive = True
+                   self.IsGameLost ()
             else :
                 print ("à l'eau")
                 button.setStyleSheet("background-color: blue")
@@ -194,14 +196,12 @@ class Window(QMainWindow):
                         self.isXactive = False
                         self.iteration = 1
                         self.direction = 1
-            self.IsGameWin ()
             if playingOnEnemyGrid == True:
                 self.choosePlaceToFight()
-                self.IsGameLost()
         else:
             print('placez vos bateaux !!!')
 
-    def IsGameWin (self):
+    def IsGameWon (self) :
         numberOfShipEnnemyDestroyed = 0
         for shipEnnemy in Ships_enemy :
             ship_ennemy_name = globals()[shipEnnemy['name']]
@@ -210,7 +210,7 @@ class Window(QMainWindow):
         if numberOfShipEnnemyDestroyed == len (Ships_enemy) :
             print ("Vous avez gagné !")
 
-    def IsGameLost (self):
+    def IsGameLost (self) :
         numberOfShipDestroyed = 0
         for ship in Ships :
             ship_name = globals()[ship['name']]
