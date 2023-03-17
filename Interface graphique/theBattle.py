@@ -2,6 +2,7 @@ import sys
 from functools import partial
 from PyQt5.QtWidgets import QRadioButton, QFrame, QApplication, QMainWindow, QCheckBox, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QWidget
 from classes import Ship
+from PyQt5.QtCore import QCoreApplication
 import random
 
 DEBUG = True
@@ -66,7 +67,8 @@ class Window(QMainWindow):
         spacer=QLabel('')
         self.winBattle = QLabel ('Vous avez gagné félicitation !')
         self.looseBattle = QLabel ("Vous avez perdu dommage...")
-        self.PlayAgain = QPushButton ("Voulez vous rejouer ?")
+        self.PlayAgain = QPushButton ("rejouer :)")
+        self.PlayAgain.clicked.connect (self.DoANewGame)
         self.weaponTitle = QLabel("Vos armes")
         self.coupdeburst = QCheckBox(f"Coup de Burst.\n L'arme du Thousand Sunny,\n un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
         self.Barrel = QCheckBox(f"Barrel.\n L'arme du Vogue Merry,\n une explosion terrifiante {Vogue_Merry.NumberOfUse}")
@@ -259,8 +261,20 @@ class Window(QMainWindow):
             self.grid_center.addWidget(self.Barrel)
         print('isBattleStarted ', self.isBattleStarted)
 
+<<<<<<< Updated upstream
 
 
+=======
+        def weapons (self):
+            if QRadioButton.setChecked(True) in self.grid_center:
+                frame_weapon = QFrame
+                frame_weapon.setFixedSize(400, 400)
+                self.grid_weapon = QVBoxLayout()
+                frame_weapon.setLayout(self.grid_weapon)
+                self.choice = QLabel (f"Voulez-vous utilisez l'arme {QRadioButton.setChecked(True)}")
+                self.grid_weapon.addWidget(self.choice)
+
+>>>>>>> Stashed changes
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
         selector = ""
@@ -300,15 +314,12 @@ class Window(QMainWindow):
         ref = 0 if Ship.alignement == "V" else 1
         startPosition = Ship.position[ref]
         endPosition = Ship.position[ref] + Ship.size
-
         if (endPosition <= self.gridSize) and (startPosition >= 0):
                 for i in range(startPosition, endPosition):
                     if (Ship.alignement == "V") and (buttons[i][y].state == True):
                         errorPosition = True
-                    
                     if (Ship.alignement == "H") and (buttons[x][i].state == True):
                         errorPosition = True
-
         if (endPosition <= self.gridSize) and (startPosition >= 0) and (errorPosition == False):
                 for i in range(startPosition, endPosition):
                     self.isPositionned = True
@@ -354,7 +365,17 @@ class Window(QMainWindow):
         ship = globals()[self.activeShip]
         self.removeShipFromGrid(ship.id)
         self.btnGridSelected(x, y, ship)
-        
+
+    def DoANewGame (self):
+        self.close()
+        if not QCoreApplication.instance():
+            new_app = QApplication(sys.argv)
+        else :
+            new_app = QCoreApplication.instance()
+        new_main_window = Window()
+        new_main_window.show()
+        new_app.exec_()
+
 # les gentils
 Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", "La déchéance d'un Homme", 1)
 Vogue_Merry = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
@@ -381,10 +402,11 @@ Ships_enemy= [
     {'id': 4, 'name': 'Toto_enemy'}
 ]
 
-app = QApplication(sys.argv)
-window = Window()
-window.show()
-sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = Window()
+    main_window.show()
+    sys.exit(app.exec_())
 
 
 
