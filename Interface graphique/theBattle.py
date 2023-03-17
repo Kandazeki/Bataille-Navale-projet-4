@@ -64,10 +64,10 @@ class Window(QMainWindow):
         self.button_center = QPushButton("Embarquement ...", self)
         spacer=QLabel('')
         self.weaponTitle = QLabel("Vos armes")
-        self.coupdeburst = QRadioButton(f"Coup de Burst.\n L'arme du Thousand Sunny, un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
-        self.Barrel = QRadioButton(f"Barrel.\n L'arme du Vogue Merry, une explosion terrifiante {Vogue_Merry.NumberOfUse}")
-        self.abordage = QRadioButton(f"L'Abordage.\n Les pirates du bateau Toto envahissent les autres {Toto.NumberOfUse}")
-        self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n Un redoutable décteteur d'ennemi {Moby_Dick.NumberOfUse}")
+        self.coupdeburst = QRadioButton(f"Coup de Burst.\n L'arme du Thousand Sunny,\n un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
+        self.Barrel = QRadioButton(f"Barrel.\n L'arme du Vogue Merry,\n une explosion terrifiante {Vogue_Merry.NumberOfUse}")
+        self.abordage = QRadioButton(f"L'Abordage.\n Les pirates du bateau Toto\n envahissent les autres {Toto.NumberOfUse}")
+        self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n Un redoutable détecteur \n d'ennemi {Moby_Dick.NumberOfUse}")
         self.coupdeburst.setChecked(True)
         self.button_center.clicked.connect(self.startBattle)
         title_computer = QLabel("La flotte ennemie prête au combat")
@@ -239,6 +239,20 @@ class Window(QMainWindow):
             self.grid_center.addWidget(self.Barrel)
         print('isBattleStarted ', self.isBattleStarted)
 
+<<<<<<< Updated upstream
+=======
+        def weapons (self):
+            if QRadioButton.setChecked(True) in self.grid_center:
+                frame_weapon = QFrame
+                frame_weapon.setFixedSize(400, 400)
+                self.grid_weapon = QVBoxLayout()
+                frame_weapon.setLayout(self.grid_weapon)
+                self.choice = QLabel (f"Voulez-vous utilisez l'arme {QRadioButton.setChecked(True)}")
+                self.grid_weapon.addWidget(self.choice)
+
+
+    
+>>>>>>> Stashed changes
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
         selector = ""
