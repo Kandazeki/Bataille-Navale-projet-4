@@ -64,9 +64,11 @@ class Window(QMainWindow):
         self.button_center = QPushButton("Embarquement ...", self)
         spacer=QLabel('')
         self.weaponTitle = QLabel("Vos armes")
-        self.normal = QRadioButton('Normal')
-        self.torpille = QRadioButton('Torpille')
-        self.normal.setChecked(True)
+        self.coupdeburst = QRadioButton(f"Coup de Burst.\n L'arme du Thousand Sunny, un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
+        self.Barrel = QRadioButton(f"Barrel.\n L'arme du Vogue Merry, une explosion terrifiante {Vogue_Merry.NumberOfUse}")
+        self.abordage = QRadioButton(f"L'Abordage.\n Les pirates du bateau Toto envahissent les autres {Toto.NumberOfUse}")
+        self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n Un redoutable décteteur d'ennemi {Moby_Dick.NumberOfUse}")
+        self.coupdeburst.setChecked(True)
         self.button_center.clicked.connect(self.startBattle)
         title_computer = QLabel("La flotte ennemie prête au combat")
         self.grid_center.addWidget(self.button_center)
@@ -223,8 +225,17 @@ class Window(QMainWindow):
         if self.isReadyToPlay:
             self.isBattleStarted = True
             self.grid_center.addWidget(self.weaponTitle)
+<<<<<<< Updated upstream
             self.grid_center.addWidget(self.normal)
             self.grid_center.addWidget(self.torpille)
+=======
+            self.grid_center.addWidget(self.coupdeburst)
+            self.grid_center.addWidget(self.dechhomme)   
+            self.grid_center.addWidget(self.abordage)
+            self.grid_center.addWidget(self.Barrel)
+        print('isBattleStarted ', self.isBattleStarted)
+
+>>>>>>> Stashed changes
     
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
@@ -321,16 +332,16 @@ class Window(QMainWindow):
         self.btnGridSelected(x, y, ship)
         
 # les gentils
-Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
+Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", "La déchéance d'un Homme", 1)
 Vogue_Merry = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
-Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
-Toto = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
+Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 1)
+Toto = Ship(4, "Toto le bateau", 7, "brown", "white", "T", "L'Abordage", 1)
 
 # les méchants
-Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
+Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "red", "white", "X", "La déchéance d'un Homme", 1)
 Vogue_Merry_enemy = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
-Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
-Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
+Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 1)
+Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", "white", "T", "L'Abordage")
 
 Ships = [
     {'id': 1, 'name': 'Moby_Dick'}, 
