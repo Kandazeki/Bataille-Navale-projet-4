@@ -32,6 +32,7 @@ class Window(QMainWindow):
         self.iteration = 1
         self.direction = 1
         self.activeWeapon = 0
+        self.isEndOfTheBattle = False
 
         for x in range(self.gridSize):
             row = []
@@ -63,6 +64,9 @@ class Window(QMainWindow):
         title_player = QLabel("Votre flotte :")
         self.button_center = QPushButton("Embarquement ...", self)
         spacer=QLabel('')
+        self.winBattle = QLabel ('Vous avez gagné félicitation !')
+        self.looseBattle = QLabel ("Vous avez perdu dommage...")
+        self.PlayAgain = QPushButton ("Voulez vous rejouer ?")
         self.weaponTitle = QLabel("Vos armes")
         self.coupdeburst = QCheckBox(f"Coup de Burst.\n L'arme du Thousand Sunny,\n un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
         self.Barrel = QCheckBox(f"Barrel.\n L'arme du Vogue Merry,\n une explosion terrifiante {Vogue_Merry.NumberOfUse}")
@@ -72,6 +76,7 @@ class Window(QMainWindow):
         self.button_center.clicked.connect(self.startBattle)
         title_computer = QLabel("La flotte ennemie prête au combat")
         self.grid_center.addWidget(self.button_center)
+        
         
         # PLAYER
         frame_player = QFrame()
@@ -228,6 +233,9 @@ class Window(QMainWindow):
                 numberOfShipEnnemyDestroyed = numberOfShipEnnemyDestroyed + 1
         if numberOfShipEnnemyDestroyed == len (Ships_enemy) :
             print ("Vous avez gagné !")
+            self.isEndOfTheBattle = True
+            self.grid_center.addWidget(self.winBattle)
+            self.grid_center.addWidget(self.PlayAgain)
 
     def IsGameLost (self) :
         numberOfShipDestroyed = 0
@@ -237,6 +245,9 @@ class Window(QMainWindow):
                 numberOfShipDestroyed = numberOfShipDestroyed + 1
         if numberOfShipDestroyed == len (Ships) :
                 print ("Vous avez perdu")
+                self.isEndOfTheBattle = True
+                self.grid_center.addWidget(self.looseBattle)
+                self.grid_center.addWidget(self.PlayAgain)
 
     def startBattle(self):
         if self.isReadyToPlay:
