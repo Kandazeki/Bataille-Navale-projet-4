@@ -172,13 +172,22 @@ class Window(QMainWindow):
                         self.memoX = x
                         self.memoY = y
                 button.setStyleSheet("background-color: red")
-                for ship in Ships_enemy :
-                    if ship['id'] == button.ship :
-                        ship_name = globals()[ship['name']]
-                ship_name.touched ()
-                if ship_name.isShipDestroyed () == True :
-                    print ("le", ship_name.name, "a été détruit")
-                    self.IsGameWon ()
+                if playingOnEnemyGrid == True :
+                    for ship_enemy in Ships_enemy :
+                        if ship_enemy['id'] == button.ship :
+                            ship_enemy_name = globals()[ship_enemy['name']]
+                    ship_enemy_name.touched ()
+                    if ship_enemy_name.isShipDestroyed () == True :
+                        print ("le", ship_enemy_name.name, "a été détruit")
+                        self.IsGameWon ()
+                if playingOnEnemyGrid == False :
+                    for ship in Ships :
+                        if ship['id'] == button.ship :
+                            ship_name = globals()[ship['name']]
+                    ship_name.touched()
+                    if ship_name.isShipDestroyed () == True :
+                        print ("le", ship_name.name, "a été détruit")
+                        self.IsGameLost ()
                 if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
                    self.isSinkingBoat = False 
                    self.memoX = 100
@@ -186,7 +195,6 @@ class Window(QMainWindow):
                    self.direction = 1
                    self.iteration = 1
                    self.isXactive = True
-                   self.IsGameLost ()
             else :
                 print ("à l'eau")
                 button.setStyleSheet("background-color: blue")
@@ -225,18 +233,12 @@ class Window(QMainWindow):
         if self.isReadyToPlay:
             self.isBattleStarted = True
             self.grid_center.addWidget(self.weaponTitle)
-<<<<<<< Updated upstream
-            self.grid_center.addWidget(self.normal)
-            self.grid_center.addWidget(self.torpille)
-=======
             self.grid_center.addWidget(self.coupdeburst)
             self.grid_center.addWidget(self.dechhomme)   
             self.grid_center.addWidget(self.abordage)
             self.grid_center.addWidget(self.Barrel)
         print('isBattleStarted ', self.isBattleStarted)
 
->>>>>>> Stashed changes
-    
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
         selector = ""
