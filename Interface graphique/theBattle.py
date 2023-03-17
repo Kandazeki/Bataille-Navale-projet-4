@@ -133,32 +133,23 @@ class Window(QMainWindow):
             if self.buttons[x][y].isPlayed != True:
                 self.fight(x, y, False)
             else:
-                print('déjà touché ',x, y)
                 self.choosePlaceToFight()
 
     def precisionFight(self):
-        print("tir de précision")
         if self.isXactive == True:
-            print('isXactive ', self.isXactive)
-            print(self.memoX, self.iteration, self.direction)
             x = self.calcNewPosition(self.memoX)
             y = self.memoY
         else:
             x = self.memoX
             y = self.calcNewPosition(self.memoY)
-
-        print('nouvelles coordonnées : ', x, y, self.iteration)
         self.iteration = self.iteration + 1
         self.fight(x, y, False)
 
     def calcNewPosition(self, memo):
         xy = memo + (self.iteration * self.direction)
-        print('new xy = ', xy)
-        print('gridSize = ', self.gridSize)
         if xy >= self.gridSize:
             self.direction = -1
             self.iteration = 1
-            print('attention on risque de quitter la grille')
             xy = self.calcNewPosition(memo)
         if xy < 0:
             self.direction = 1
@@ -170,12 +161,10 @@ class Window(QMainWindow):
     def fight(self, x, y, playingOnEnemyGrid = True):
         button = self.buttons_enemy[x][y] if playingOnEnemyGrid == True else self.buttons[x][y]
         button.isPlayed = True
-
         if self.isBattleStarted:
             if button.state == True :
                 print ("touché ", button.ship)
                 if playingOnEnemyGrid == False:
-                    print('bateau ami touché : ', self.iteration)
                     self.isSinkingBoat = True
                     if self.memoX == 100:
                         self.memoX = x
@@ -185,7 +174,8 @@ class Window(QMainWindow):
                     if ship['id'] == button.ship :
                         ship_name = globals()[ship['name']]
                 ship_name.touched ()
-                ship_name.isShipDestroyed ()
+                if ship_name.isShipDestroyed () == True :
+                    print ("le", ship_name.name, "a été détruit")
                 if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
                    self.isSinkingBoat = False 
                    self.memoX = 100
@@ -204,22 +194,14 @@ class Window(QMainWindow):
                         self.isXactive = False
                         self.iteration = 1
                         self.direction = 1
-                    
-            print('attaque ', x, y)
-            if (playingOnEnemyGrid == True):
+            self.IsGameWin ()
+            if playingOnEnemyGrid == True:
                 self.choosePlaceToFight()
+                self.IsGameLost()
         else:
             print('placez vos bateaux !!!')
 
-    def IsGameOver (self):
-        numberOfShipDestroyed = 0
-        for ship in Ships :
-            ship_name = globals()[ship['name']]
-            print (ship_name.name)
-            if ship_name.isShipDestroyed () == True :
-                numberOfShipDestroyed = numberOfShipDestroyed + 1   
-        if numberOfShipDestroyed == len (Ships) :
-                print ("Vous avez perdu")
+    def IsGameWin (self):
         numberOfShipEnnemyDestroyed = 0
         for shipEnnemy in Ships_enemy :
             ship_ennemy_name = globals()[shipEnnemy['name']]
@@ -228,15 +210,21 @@ class Window(QMainWindow):
         if numberOfShipEnnemyDestroyed == len (Ships_enemy) :
             print ("Vous avez gagné !")
 
+    def IsGameLost (self):
+        numberOfShipDestroyed = 0
+        for ship in Ships :
+            ship_name = globals()[ship['name']]
+            if ship_name.isShipDestroyed () == True :
+                numberOfShipDestroyed = numberOfShipDestroyed + 1
+        if numberOfShipDestroyed == len (Ships) :
+                print ("Vous avez perdu")
+
     def startBattle(self):
-        print ('isReadyToPlay ', self.isReadyToPlay)
         if self.isReadyToPlay:
             self.isBattleStarted = True
             self.grid_center.addWidget(self.weaponTitle)
             self.grid_center.addWidget(self.normal)
-            self.grid_center.addWidget(self.torpille)   
-        print('isBattleStarted ', self.isBattleStarted)
-
+            self.grid_center.addWidget(self.torpille)
     
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
@@ -281,11 +269,9 @@ class Window(QMainWindow):
         if (endPosition <= self.gridSize) and (startPosition >= 0):
                 for i in range(startPosition, endPosition):
                     if (Ship.alignement == "V") and (buttons[i][y].state == True):
-                        print('erreur de position')
                         errorPosition = True
                     
                     if (Ship.alignement == "H") and (buttons[x][i].state == True):
-                        print ('erreur 2 de position')
                         errorPosition = True
 
         if (endPosition <= self.gridSize) and (startPosition >= 0) and (errorPosition == False):
@@ -301,7 +287,6 @@ class Window(QMainWindow):
         ready = True
         for x in Ships:
             ship = globals()[x['name']]
-            print (ship.position)
             if not ship.position: 
                 ready = False 
         if ready == True:

@@ -17,7 +17,6 @@ class Ship :
     # je diminue de 1 la vie du bateau si il est touché
     def touched (self):
         self.life = self.life - 1
-        print (self.life)
 
     # je diminue de 1 le nombre de munition si le bateau peut attaquer
     def useWeapon (self):
