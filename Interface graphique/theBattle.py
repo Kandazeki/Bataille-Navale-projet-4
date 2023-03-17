@@ -261,10 +261,6 @@ class Window(QMainWindow):
             self.grid_center.addWidget(self.Barrel)
         print('isBattleStarted ', self.isBattleStarted)
 
-<<<<<<< Updated upstream
-
-
-=======
         def weapons (self):
             if QRadioButton.setChecked(True) in self.grid_center:
                 frame_weapon = QFrame
@@ -274,7 +270,6 @@ class Window(QMainWindow):
                 self.choice = QLabel (f"Voulez-vous utilisez l'arme {QRadioButton.setChecked(True)}")
                 self.grid_weapon.addWidget(self.choice)
 
->>>>>>> Stashed changes
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
         selector = ""
