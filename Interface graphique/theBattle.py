@@ -70,11 +70,11 @@ class Window(QMainWindow):
         self.PlayAgain = QPushButton ("rejouer :)")
         self.PlayAgain.clicked.connect (self.DoANewGame)
         self.weaponTitle = QLabel("Vos armes")
-        self.coupdeburst = QCheckBox(f"Coup de Burst.\n L'arme du Thousand Sunny,\n un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
-        self.Barrel = QCheckBox(f"Barrel.\n L'arme du Vogue Merry,\n une explosion terrifiante {Vogue_Merry.NumberOfUse}")
-        self.abordage = QCheckBox(f"L'Abordage.\n Les pirates du bateau Toto\n envahissent les autres {Toto.NumberOfUse}")
-        self.dechhomme = QCheckBox(f"La déchéance d'un Homme.\n Un redoutable détecteur \n d'ennemi {Moby_Dick.NumberOfUse}")
-        self.coupdeburst.setChecked(True)
+        self.coupdeburst = QRadioButton(f"Coup de Burst.\n L'arme du Thousand Sunny,\n un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
+        self.Barrel = QRadioButton(f"Barrel.\n L'arme du Vogue Merry,\n une explosion terrifiante {Vogue_Merry.NumberOfUse}")
+        self.abordage = QRadioButton(f"L'Abordage.\n Les pirates du bateau Toto\n envahissent les autres {Toto.NumberOfUse}")
+        self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n Un redoutable détecteur \n d'ennemi {Moby_Dick.NumberOfUse}")
+        self.coupdeburst.setChecked(False)
         self.button_center.clicked.connect(self.startBattle)
         title_computer = QLabel("La flotte ennemie prête au combat")
         self.grid_center.addWidget(self.button_center)
@@ -165,15 +165,19 @@ class Window(QMainWindow):
             self.iteration = 1
             self.isXactive = False
             xy = self.calcNewPosition(memo)
-        return xy
- 
-    def weapons (self):
-        if self.abordage.isChecked :
-            print ('La boite est checké')
-        else:
-            print ('NO')
-        
+        return xy      
 
+    def weapons (self):
+            if QRadioButton.isChecked == True:
+                print ('Incr')
+                """frame_weapon = QFrame
+                frame_weapon.setFixedSize(400, 400)
+                self.grid_weapon = QVBoxLayout()
+                frame_weapon.setLayout(self.grid_weapon)
+                self.choice = QLabel (f"Voulez-vous utilisez l'arme {QRadioButton.setChecked(True)}")
+                self.grid_weapon.addWidget(self.choice)"""
+            elif QRadioButton.isChecked == False:
+                print ('I m dead')
 
 
     def fight (self, x, y, playingOnEnemyGrid = True):
@@ -189,6 +193,7 @@ class Window(QMainWindow):
                         self.memoY = y
                 button.setStyleSheet("background-color: red")
                 if playingOnEnemyGrid == True :
+                    self.weapons()
                     for ship_enemy in Ships_enemy :
                         if ship_enemy['id'] == button.ship :
                             ship_enemy_name = globals()[ship_enemy['name']]
@@ -197,6 +202,7 @@ class Window(QMainWindow):
                         print ("le", ship_enemy_name.name, "a été détruit")
                         self.IsGameWon ()
                 if playingOnEnemyGrid == False :
+                    self.weapons()
                     for ship in Ships :
                         if ship['id'] == button.ship :
                             ship_name = globals()[ship['name']]
@@ -261,14 +267,6 @@ class Window(QMainWindow):
             self.grid_center.addWidget(self.Barrel)
         print('isBattleStarted ', self.isBattleStarted)
 
-        def weapons (self):
-            if QRadioButton.setChecked(True) in self.grid_center:
-                frame_weapon = QFrame
-                frame_weapon.setFixedSize(400, 400)
-                self.grid_weapon = QVBoxLayout()
-                frame_weapon.setLayout(self.grid_weapon)
-                self.choice = QLabel (f"Voulez-vous utilisez l'arme {QRadioButton.setChecked(True)}")
-                self.grid_weapon.addWidget(self.choice)
 
     def displayShipPlayer(self, Ship, line, isSelected = False):
         shipSelector = "selector", Ship.id
@@ -370,6 +368,11 @@ class Window(QMainWindow):
         new_main_window = Window()
         new_main_window.show()
         new_app.exec_()
+
+    
+
+
+
 
 # les gentils
 Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", "La déchéance d'un Homme", 1)
