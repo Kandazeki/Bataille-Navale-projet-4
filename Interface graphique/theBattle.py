@@ -1,8 +1,9 @@
 import sys
 from functools import partial
-from PyQt5.QtWidgets import QRadioButton, QFrame, QApplication, QMainWindow, QCheckBox, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QWidget
+from PyQt5.QtWidgets import QApplication, QTextEdit, QRadioButton, QFrame, QApplication, QMainWindow, QCheckBox, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QWidget
+from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtGui import QTextCursor
 from classes import Ship
-from PyQt5.QtCore import QCoreApplication
 import random
 
 DEBUG = True
@@ -19,7 +20,7 @@ class Window(QMainWindow):
         self.grid_computer = QGridLayout()
         self.grid_center = QVBoxLayout()
 
-        self.gridSize = 15
+        self.gridSize = 10
         self.activeShip = ''
         self.styleBlocks = "background-color: #f4f4f4;"
 
@@ -32,8 +33,7 @@ class Window(QMainWindow):
         self.isXactive = True
         self.iteration = 1
         self.direction = 1
-        self.activeWeapon = 0
-        self.isEndOfTheBattle = False
+        self.activeWeapon = 0 # default = 0, torpille = 1, bombe = 2  
 
         for x in range(self.gridSize):
             row = []
@@ -64,40 +64,56 @@ class Window(QMainWindow):
         
         title_player = QLabel("Votre flotte :")
         self.button_center = QPushButton("Embarquement ...", self)
-        spacer=QLabel('')
         self.winBattle = QLabel ('Vous avez gagné félicitation !')
         self.looseBattle = QLabel ("Vous avez perdu dommage...")
         self.PlayAgain = QPushButton ("rejouer :)")
         self.PlayAgain.clicked.connect (self.DoANewGame)
         self.weaponTitle = QLabel("Vos armes")
-        self.coupdeburst = QRadioButton(f"Coup de Burst.\n L'arme du Thousand Sunny,\n un réel coup de torpille{Thousand_Sunny.NumberOfUse}")
-        self.Barrel = QRadioButton(f"Barrel.\n L'arme du Vogue Merry,\n une explosion terrifiante {Vogue_Merry.NumberOfUse}")
-        self.abordage = QRadioButton(f"L'Abordage.\n Les pirates du bateau Toto\n envahissent les autres {Toto.NumberOfUse}")
-        self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n Un redoutable détecteur \n d'ennemi {Moby_Dick.NumberOfUse}")
-        self.coupdeburst.setChecked(False)
+        self.normal = QRadioButton('Normal')
+        self.normal.setObjectName('0')
+        self.coupdeburst = QRadioButton(f"Coup de Burst.\n {Thousand_Sunny.NumberOfUse} / {Thousand_Sunny_enemy.NumberOfUse}")
+        self.coupdeburst.setObjectName('1')
+        self.coupdeburst.setToolTip("L'arme du Thousand Sunny,\n un réel coup de torpille")
+        self.coupdeburstMode = QCheckBox("V")
+        self.coupdeburstGroup = QHBoxLayout()
+        self.coupdeburstGroup.addWidget(self.coupdeburst)
+        self.coupdeburstGroup.addWidget(self.coupdeburstMode)
+        self.barrel = QRadioButton(f"Barrel\n {Vogue_Merry.NumberOfUse} / {Vogue_Merry_enemy.NumberOfUse}")
+        self.barrel.setToolTip("L'arme du Vogue Merry,\n une explosion terrifiante")
+        self.barrel.setObjectName('2')
+        #self.abordage = QRadioButton(f"L'Abordage.\n  {Toto.NumberOfUse}/ {Toto_enemy.NumberOfUse}")
+        #self.abordage.setToolTip ('Les pirates du bateau Toto\n envahissent les autres')
+        #self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n {Moby_Dick.NumberOfUse}/{Moby_Dick_enemy.NumberofUse}")
+        #self.dechhomme.setToolTip ('Un redoutable détecteur d'ennemi')
+        self.normal.setChecked(True)
         self.button_center.clicked.connect(self.startBattle)
         title_computer = QLabel("La flotte ennemie prête au combat")
+        self.text_edit = QTextEdit(self)
+        self.text_edit.setReadOnly(True)
+        self.text_edit.setLineWrapMode(QTextEdit.NoWrap)
+        self.grid_center.addWidget(self.text_edit)
         self.grid_center.addWidget(self.button_center)
-        
+
+        self.log('Bonjour')
+        self.log('Placez vos bateaux')
         
         # PLAYER
         frame_player = QFrame()
-        frame_player.setFixedSize(600, 600)
+        frame_player.setFixedSize(400, 500)
         frame_player.setLayout(self.grid_player)
         frame_player.setLayout(self.grid_player)
         title = QHBoxLayout()
         title.addWidget(title_player)
         self.grid_player.addLayout(title, self.gridSize+1, 0, 1, 10)
 
-
         # CENTER
         frame_center = QFrame()
-        frame_center.setFixedSize(200, 600)
+        frame_center.setFixedSize(220, 500)
         frame_center.setLayout(self.grid_center)
 
         # COMPUTER
         frame_computer = QFrame()
-        frame_computer.setFixedSize(600, 600)
+        frame_computer.setFixedSize(400, 500)
         frame_computer.setLayout(self.grid_computer)
         title = QHBoxLayout()
         title.addWidget(title_computer)
@@ -121,8 +137,12 @@ class Window(QMainWindow):
             self.displayShipPlayer(object, self.gridSize+i, selected)
             i = i + 1 
 
+        i = 2
         for ship in Ships_enemy:
             self.isPositionned = False
+            shipName = ship['name']
+            object = globals()[shipName]
+            self.displayShipEnemy(object, self.gridSize+i)
             while (self.isPositionned == False):
                 x = random.randint(1, self.gridSize-1)
                 y = random.randint(1, self.gridSize-1)
@@ -131,6 +151,14 @@ class Window(QMainWindow):
                 myShip.position = [x, y]
                 myShip.alignement = alignement
                 self.btnGridSelected(x, y, myShip, True)
+            i = i + 1
+            
+    def log(self, message):
+        message = str(message)
+        self.text_edit.moveCursor(QTextCursor.End)
+        self.text_edit.insertPlainText(message + '\n')
+        self.text_edit.moveCursor(QTextCursor.End)
+        self.text_edit.ensureCursorVisible()
 
     def choosePlaceToFight(self):
         if self.isSinkingBoat == True:
@@ -142,74 +170,144 @@ class Window(QMainWindow):
             if self.buttons[x][y].isPlayed != True:
                 self.fight(x, y, False)
             else:
+                self.log('déjà touché ' + str(x) + ',' + str(y))
                 self.choosePlaceToFight()
 
     def precisionFight(self):
+        self.log("tir de précision")
         if self.isXactive == True:
+            self.log('isXactive ' + str(self.isXactive))
+            self.log(str(self.memoX) + str(self.iteration) + str(self.direction))
             x = self.calcNewPosition(self.memoX)
             y = self.memoY
         else:
             x = self.memoX
             y = self.calcNewPosition(self.memoY)
+
+        self.log('nouvelles coordonnées : ' + str(x) + str(y) + str(self.iteration))
         self.iteration = self.iteration + 1
         self.fight(x, y, False)
 
     def calcNewPosition(self, memo):
         xy = memo + (self.iteration * self.direction)
+        self.log('new xy = ' + str(xy))
+        self.log('gridSize = ' + str(self.gridSize))
         if xy >= self.gridSize:
             self.direction = -1
             self.iteration = 1
+            self.log('attention on risque de quitter la grille')
             xy = self.calcNewPosition(memo)
         if xy < 0:
             self.direction = 1
             self.iteration = 1
             self.isXactive = False
             xy = self.calcNewPosition(memo)
-        return xy      
+        return xy
 
-    def weapons (self):
-            if QRadioButton.isChecked == True:
-                print ('Incr')
-                """frame_weapon = QFrame
-                frame_weapon.setFixedSize(400, 400)
-                self.grid_weapon = QVBoxLayout()
-                frame_weapon.setLayout(self.grid_weapon)
-                self.choice = QLabel (f"Voulez-vous utilisez l'arme {QRadioButton.setChecked(True)}")
-                self.grid_weapon.addWidget(self.choice)"""
-            elif QRadioButton.isChecked == False:
-                print ('I m dead')
-
-
-    def fight (self, x, y, playingOnEnemyGrid = True):
+    def fight(self, x, y, playingOnEnemyGrid = True):
         button = self.buttons_enemy[x][y] if playingOnEnemyGrid == True else self.buttons[x][y]
         button.isPlayed = True
+
         if self.isBattleStarted:
-            if button.state == True :
-                print ("touché ", button.ship)
+            # torpille
+            if self.activeWeapon == 1: 
+                modeVerical = self.coupdeburstMode.isChecked()
+                self.log('Coupdeburst ...')
+                ref = x if modeVerical else y
+                hasTouched = False
+                for xy in range(ref, self.gridSize):
+                    if playingOnEnemyGrid == True:
+                        targetedButtons = self.buttons_enemy
+                    else:
+                        targetedButtons = self.buttons
+                    refButton = targetedButtons[xy][y] if modeVerical else targetedButtons[x][xy]
+                    if refButton.state == False:
+                        refButton.setStyleSheet("background-color: blue")
+                    else:
+                        hasTouched = True
+                        break
+
+                if playingOnEnemyGrid == True:
+                    Thousand_Sunny.useWeapon()
+                else:
+                    Thousand_Sunny_enemy.useWeapon()
+
+                if Thousand_Sunny.IsAbleToUseWeapon() == False:
+                    self.coupdeburst.setDisabled(True)
+
+                self.coupdeburst.setText(f"Coup de Burst.\n {Thousand_Sunny.NumberOfUse} / {Thousand_Sunny_enemy.NumberOfUse}")
+                self.activeWeapon = 0
+                self.normal.setChecked(True)
+                
+                if hasTouched == True:
+                    self.log ('La torpille a touché un truc')
+                    if modeVerical:
+                        self.fight(xy, y)
+                    else:
+                        self.fight(x, xy)
+                    return
+                else:
+                    self.log('Echec de la torpille')
+            
+            # bombe
+            if self.activeWeapon == 2: 
+                self.log('Barrel ...')
+                ref = 4*[xy]
+                hasTouched = False
+                for xy in range(ref, self.gridSize):
+                    if playingOnEnemyGrid == True:
+                        targetedButtons = self.buttons_enemy
+                    else:
+                        targetedButtons = self.buttons
+                    refButton = targetedButtons [xy]
+                    if refButton.state == False:
+                        refButton.setStyleSheet("background-color: blue")
+                    else:
+                        hasTouched = True
+                        break
+
+                if playingOnEnemyGrid == True:
+                    Vogue_Merry.useWeapon()
+                else:
+                    Vogue_Merry_enemy.useWeapon()
+
+                if Vogue_Merry.IsAbleToUseWeapon() == False:
+                    self.coupdeburst.setDisabled(True)
+
+                self.barrel.setText(f"Barrel.\n {Vogue_Merry.NumberOfUse} / {Vogue_Merry_enemy.NumberOfUse}")
+                self.activeWeapon = 0
+                self.normal.setChecked(True)
+                
+                if hasTouched == True:
+                    self.log ('Barrel a touché un truc')
+                else:
+                    self.log('Echec du Barrel')
+            
+
+            #Le bateau est touché (colorier en rouge et affiche)
+            elif button.state == True :
+                self.log ("touché " + str(button.ship))
+                activeListShip = Ships if playingOnEnemyGrid == True else Ships_enemy
                 if playingOnEnemyGrid == False:
                     self.isSinkingBoat = True
                     if self.memoX == 100:
                         self.memoX = x
                         self.memoY = y
                 button.setStyleSheet("background-color: red")
-                if playingOnEnemyGrid == True :
-                    self.weapons()
-                    for ship_enemy in Ships_enemy :
-                        if ship_enemy['id'] == button.ship :
-                            ship_enemy_name = globals()[ship_enemy['name']]
-                    ship_enemy_name.touched ()
-                    if ship_enemy_name.isShipDestroyed () == True :
-                        print ("le", ship_enemy_name.name, "a été détruit")
-                        self.IsGameWon ()
-                if playingOnEnemyGrid == False :
-                    self.weapons()
+                
+                if playingOnEnemyGrid == True:
+                    for ship in Ships_enemy :
+                        if ship['id'] == button.ship :
+                            ship_name = globals()[ship['name']]
+                    ship_name.touched ()
+                    self.IsGameWon ()
+                else:
                     for ship in Ships :
                         if ship['id'] == button.ship :
                             ship_name = globals()[ship['name']]
-                    ship_name.touched()
-                    if ship_name.isShipDestroyed () == True :
-                        print ("le", ship_name.name, "a été détruit")
-                        self.IsGameLost ()
+                    ship_name.touched ()
+                    self.IsGameLost () 
+
                 if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
                    self.isSinkingBoat = False 
                    self.memoX = 100
@@ -217,8 +315,9 @@ class Window(QMainWindow):
                    self.direction = 1
                    self.iteration = 1
                    self.isXactive = True
+                
             else :
-                print ("à l'eau")
+                self.log ("A l'eau")
                 button.setStyleSheet("background-color: blue")
                 if playingOnEnemyGrid == False and self.isSinkingBoat == True:
                     if self.direction == 1:
@@ -228,50 +327,32 @@ class Window(QMainWindow):
                         self.isXactive = False
                         self.iteration = 1
                         self.direction = 1
-            if playingOnEnemyGrid == True:
+                    
+            if (playingOnEnemyGrid == True):
                 self.choosePlaceToFight()
         else:
-            print('placez vos bateaux !!!')
-
-    def IsGameWon (self) :
-        numberOfShipEnnemyDestroyed = 0
-        for shipEnnemy in Ships_enemy :
-            ship_ennemy_name = globals()[shipEnnemy['name']]
-            if ship_ennemy_name.isShipDestroyed () == True :
-                numberOfShipEnnemyDestroyed = numberOfShipEnnemyDestroyed + 1
-        if numberOfShipEnnemyDestroyed == len (Ships_enemy) :
-            print ("Vous avez gagné !")
-            self.isEndOfTheBattle = True
-            self.grid_center.addWidget(self.winBattle)
-            self.grid_center.addWidget(self.PlayAgain)
-
-    def IsGameLost (self) :
-        numberOfShipDestroyed = 0
-        for ship in Ships :
-            ship_name = globals()[ship['name']]
-            if ship_name.isShipDestroyed () == True :
-                numberOfShipDestroyed = numberOfShipDestroyed + 1
-        if numberOfShipDestroyed == len (Ships) :
-                print ("Vous avez perdu")
-                self.isEndOfTheBattle = True
-                self.grid_center.addWidget(self.looseBattle)
-                self.grid_center.addWidget(self.PlayAgain)
+            self.log('Placez vos bateaux !!!')
 
     def startBattle(self):
+        self.log ('isReadyToPlay ' + str(self.isReadyToPlay))
         if self.isReadyToPlay:
             self.isBattleStarted = True
             self.grid_center.addWidget(self.weaponTitle)
-            self.grid_center.addWidget(self.coupdeburst)
-            self.grid_center.addWidget(self.dechhomme)   
-            self.grid_center.addWidget(self.abordage)
-            self.grid_center.addWidget(self.Barrel)
-        print('isBattleStarted ', self.isBattleStarted)
+            self.grid_center.addWidget(self.normal)
+            self.grid_center.addLayout(self.coupdeburstGroup, 2)   
+            self.grid_center.addWidget(self.barrel)
+            self.normal.toggled.connect(self.changeWeapon)
+            self.coupdeburst.toggled.connect(self.changeWeapon)
+            self.barrel.toggled.connect(self.changeWeapon)
+        self.log('isBattleStarted ' + str(self.isBattleStarted))
 
+    def changeWeapon(self):
+        radioButton = self.sender()
+        if radioButton.isChecked():
+            self.activeWeapon = int(radioButton.objectName())
+            self.log('Option sélectionnée :' +  str(radioButton.text()) + ' / ' + str(self.activeWeapon))
 
     def displayShipPlayer(self, Ship, line, isSelected = False):
-        shipSelector = "selector", Ship.id
-        selector = ""
-        globals()[selector] = shipSelector
         selector = QRadioButton(f"{Ship.name} ({Ship.size})")
         selector.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
         selector.setAccessibleName(str(Ship.id))
@@ -284,7 +365,17 @@ class Window(QMainWindow):
         inputs.addWidget(check_box)
         self.grid_player.addLayout(inputs, line, 0, 1, 10)
         if (isSelected):
-                self.defineActiveShip(Ship.id)
+            self.defineActiveShip(Ship.id)
+    
+    def displayShipEnemy(self, Ship, line):
+        shipSelector = "selector", Ship.id
+        selector = ""
+        globals()[selector] = shipSelector
+        selector = QLabel(f"{Ship.name} ({Ship.size})")
+        selector.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
+        inputs = QHBoxLayout()
+        inputs.addWidget(selector)
+        self.grid_computer.addLayout(inputs, line, 0, 1, 10)
 
     def bouton_toggle(self, radioBtn):
         if (radioBtn.isChecked()):
@@ -307,12 +398,15 @@ class Window(QMainWindow):
         ref = 0 if Ship.alignement == "V" else 1
         startPosition = Ship.position[ref]
         endPosition = Ship.position[ref] + Ship.size
+
         if (endPosition <= self.gridSize) and (startPosition >= 0):
                 for i in range(startPosition, endPosition):
                     if (Ship.alignement == "V") and (buttons[i][y].state == True):
                         errorPosition = True
+                    
                     if (Ship.alignement == "H") and (buttons[x][i].state == True):
                         errorPosition = True
+
         if (endPosition <= self.gridSize) and (startPosition >= 0) and (errorPosition == False):
                 for i in range(startPosition, endPosition):
                     self.isPositionned = True
@@ -368,23 +462,43 @@ class Window(QMainWindow):
         new_main_window = Window()
         new_main_window.show()
         new_app.exec_()
-
     
-
-
-
-
+    def IsGameWon (self) :
+        self.log ('isGameWon ? ')
+        if self.areAllShipsDestroyed(Ships_enemy):
+            self.log ("Vous avez gagné !")
+            self.grid_center.addWidget(self.winBattle)
+            self.grid_center.addWidget(self.PlayAgain)
+    
+    def IsGameLost (self) :
+        if self.areAllShipsDestroyed(Ships) :
+                self.log ("Vous avez perdu")
+                self.isEndOfTheBattle = True
+                self.grid_center.addWidget(self.looseBattle)
+                self.grid_center.addWidget(self.PlayAgain)
+    
+    def areAllShipsDestroyed(self, ships):
+        numbreOfShipsDestroyed = 0
+        for ship in ships:
+            ship_name = globals()[ship['name']]
+            if ship_name.isShipDestroyed () == True :
+                numbreOfShipsDestroyed = numbreOfShipsDestroyed + 1
+            if numbreOfShipsDestroyed == len(ships):
+                return True
+            else:
+                return False
+        
 # les gentils
-Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", "La déchéance d'un Homme", 1)
+Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
 Vogue_Merry = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
-Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 1)
-Toto = Ship(4, "Toto le bateau", 7, "brown", "white", "T", "L'Abordage", 1)
+Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
+Toto = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
 
 # les méchants
-Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "red", "white", "X", "La déchéance d'un Homme", 1)
+Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
 Vogue_Merry_enemy = Ship (2, "Merry", 2, "blue", "white", "O", "barrel", 2)
-Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 1)
-Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", "white", "T", "L'Abordage")
+Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3, "yellow", "black", "#", "coup de burst", 3)
+Toto_enemy = Ship(4, "Toto le bateau", 7, "brown", "white", "T", None)
 
 Ships = [
     {'id': 1, 'name': 'Moby_Dick'}, 
@@ -393,6 +507,10 @@ Ships = [
     {'id': 4, 'name': 'Toto'}
 ]
 
+#Ships = [
+#    {'id': 1, 'name': 'Moby_Dick'}, 
+#]
+
 Ships_enemy= [
     {'id': 1, 'name': 'Moby_Dick_enemy'}, 
     {'id': 2, 'name': 'Vogue_Merry_enemy'},
@@ -400,11 +518,15 @@ Ships_enemy= [
     {'id': 4, 'name': 'Toto_enemy'}
 ]
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    main_window = Window()
-    main_window.show()
-    sys.exit(app.exec_())
+app = QApplication(sys.argv)
+window = Window()
+window.show()
+
+toto = Window()
+toto.show()
+toto.log('Bonjour Toto')
+
+sys.exit(app.exec_())
 
 
 
