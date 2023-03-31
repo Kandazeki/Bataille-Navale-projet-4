@@ -175,7 +175,6 @@ class Window(QMainWindow):
 
     def precisionFight(self):
         if self.isXactive == True:
-            self.log(str(self.memoX) + str(self.iteration) + str(self.direction))
             x = self.calcNewPosition(self.memoX)
             y = self.memoY
         else:
@@ -205,7 +204,6 @@ class Window(QMainWindow):
         if self.isBattleStarted:
             if self.activeWeapon == 1: # torpille
                 modeVerical = self.coupdeburstMode.isChecked()
-                self.log('Coupdeburst ...')
                 ref = x if modeVerical else y
                 hasTouched = False
                 for xy in range(ref, self.gridSize):
@@ -233,17 +231,14 @@ class Window(QMainWindow):
                 self.normal.setChecked(True)
                 
                 if hasTouched == True:
-                    self.log ('La torpille a touché un truc')
                     if modeVerical:
                         self.fight(xy, y)
                     else:
                         self.fight(x, xy)
                     return
-                else:
-                    self.log('Echec de la torpille')
 
             elif button.state == True :
-                self.log ("touché " + str(button.ship))
+                self.log ("touché ")
                 if playingOnEnemyGrid == False :
                     self.isSinkingBoat = True
                     if self.memoX == 100 :
@@ -256,7 +251,7 @@ class Window(QMainWindow):
                             ship_enemy_name = globals()[ship_enemy['name']]
                     ship_enemy_name.touched ()
                     if ship_enemy_name.isShipDestroyed () == True :
-                        self.log ("le"+ str(ship_enemy_name.name) + "a été détruit")
+                        self.log ("le "+ str(ship_enemy_name.name) + " a été détruit")
                         self.IsGameWon ()
                 if playingOnEnemyGrid == False :
                     for ship in Ships :
@@ -264,7 +259,7 @@ class Window(QMainWindow):
                             ship_name = globals()[ship['name']]
                     ship_name.touched()
                     if ship_name.isShipDestroyed () == True :
-                        print ("le" + str(ship_name.name) + "a été détruit")
+                        self.log ("le " + str(ship_name.name) + " a été détruit")
                         self.IsGameLost ()
                 if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
                    self.isSinkingBoat = False 
@@ -301,11 +296,19 @@ class Window(QMainWindow):
             self.normal.toggled.connect(self.changeWeapon)
             self.coupdeburst.toggled.connect(self.changeWeapon)
             self.barrel.toggled.connect(self.changeWeapon)
-            '''for ship in Ships : 
-                shipName = ship['name']
-                self.object = globals()[shipName]
-                self.object.id.setDisabled(True)'''
-            
+            self.TransformIntoLabel()  
+
+    def TransformIntoLabel(self):
+        # Parcourir les éléments du layout parent et remplacer chaque QRadioButton par un QLabel
+        for i in reversed(range(self.grid_player.count())):
+            widget = self.grid_player.itemAt(i).widget()
+            if isinstance(widget, QRadioButton):
+                texte = widget.text()
+                label = QLabel(texte)
+                self.grid_player.takeAt(i)
+                self.grid_player.insertWidget(i, label)
+                widget.deleteLater()
+        self.grid_player.update()
 
     def changeWeapon(self):
         radioButton = self.sender()
