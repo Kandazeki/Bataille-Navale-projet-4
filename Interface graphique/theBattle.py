@@ -2,7 +2,7 @@ import sys
 from functools import partial
 from PyQt5.QtWidgets import QApplication, QTextEdit, QRadioButton, QFrame, QApplication, QMainWindow, QCheckBox, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QWidget
 from PyQt5.QtCore import Qt, QCoreApplication
-from PyQt5.QtGui import QTextCursor
+from PyQt5.QtGui import QTextCursor, QPixmap
 from classes import Ship
 import random
 
@@ -487,6 +487,12 @@ class Window(QMainWindow):
                 return True
             else:
                 return False
+
+label = QLabel()
+
+pixmap = QPixmap("Vogue_Merry.jpg")
+label.setPixmap(pixmap)
+
         
 # les gentils
 Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", None)

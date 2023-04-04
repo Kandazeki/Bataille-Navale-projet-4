@@ -2,7 +2,7 @@ import sys
 from functools import partial
 from PyQt5.QtWidgets import QApplication, QTextEdit, QRadioButton, QFrame, QApplication, QMainWindow, QCheckBox, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QWidget
 from PyQt5.QtCore import Qt, QCoreApplication
-from PyQt5.QtGui import QTextCursor
+from PyQt5.QtGui import QTextCursor, QPixmap, QIcon
 from classes import Ship
 import random
 
@@ -398,9 +398,14 @@ class Window(QMainWindow):
         button.state = True
         button.ship = Ship.id
         if (isEnemy == False) or (DEBUG == True ):
-            button.setText(Ship.symbol)
-            button.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
-        
+           for Ship in Ships :
+            if Vogue_Merry.name :
+                pixmapMV = QPixmap('Vogue_Merry.jpg')
+                icon = QIcon(pixmapMV)
+                self.setGeometry(50,50,50,50)
+                button.setIcon(icon) 
+
+
     def removeShipFromGrid(self, id):
         for x in range(self.gridSize):
             for y in range(self.gridSize):
