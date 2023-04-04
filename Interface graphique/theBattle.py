@@ -6,7 +6,7 @@ from PyQt5.QtGui import QTextCursor, QPixmap
 from classes import Ship
 import random
 
-DEBUG = True
+DEBUG = False
 
 class Window(QMainWindow):
 
