@@ -335,19 +335,24 @@ class Window(QMainWindow):
                 self.memoY = y
         button.setStyleSheet("background-color: red")
         
-        if playingOnEnemyGrid == True:
-            for ship in Ships_enemy :
-                if ship['id'] == button.ship :
-                    ship_name = globals()[ship['name']]
-            ship_name.touched ()
-            self.IsGameWon ()
-        else:
+        # on teste si on a gagné ou perdu
+        if playingOnEnemyGrid == True :
+            for ship_enemy in Ships_enemy :
+                if ship_enemy['id'] == button.ship :
+                    ship_enemy_name = globals()[ship_enemy['name']]
+            ship_enemy_name.touched ()
+            if ship_enemy_name.isShipDestroyed () == True :
+                    self.log ("le "+ str(ship_enemy_name.name) + " a été détruit")
+                    self.IsGameWon ()
+        if playingOnEnemyGrid == False :
             for ship in Ships :
                 if ship['id'] == button.ship :
                     ship_name = globals()[ship['name']]
-            ship_name.touched ()
-            self.IsGameLost () 
-
+            ship_name.touched()
+            if ship_name.isShipDestroyed () == True :
+                    self.log ("le " + str(ship_name.name) + " a été détruit")
+                    self.IsGameLost ()
+                
         if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
             self.isSinkingBoat = False 
             self.memoX = 100
