@@ -2,7 +2,7 @@ import sys
 from functools import partial
 from PyQt5.QtWidgets import QApplication, QTextEdit, QRadioButton, QFrame, QApplication, QMainWindow, QCheckBox, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QWidget
 from PyQt5.QtCore import Qt, QCoreApplication
-from PyQt5.QtGui import QTextCursor, QPixmap, QIcon
+from PyQt5.QtGui import QTextCursor
 from classes import Ship
 import random
 
@@ -19,9 +19,6 @@ class Window(QMainWindow):
         self.grid_player = QGridLayout()
         self.grid_computer = QGridLayout()
         self.grid_center = QVBoxLayout()
-        self.inputs = QHBoxLayout()
-        self.premierradiobutton = QVBoxLayout()
-        self.deuxiemecheckbox = QVBoxLayout ()
 
         self.gridSize = 10
         self.activeShip = ''
@@ -86,10 +83,8 @@ class Window(QMainWindow):
         self.barrel.setObjectName('2')
         #self.abordage = QRadioButton(f"L'Abordage.\n  {Toto.NumberOfUse}/ {Toto_enemy.NumberOfUse}")
         #self.abordage.setToolTip ('Les pirates du bateau Toto\n envahissent les autres')
-        #self.abordage.setObjectName ('3')
         #self.dechhomme = QRadioButton(f"La déchéance d'un Homme.\n {Moby_Dick.NumberOfUse}/{Moby_Dick_enemy.NumberofUse}")
         #self.dechhomme.setToolTip ('Un redoutable détecteur d'ennemi')
-        #self.dechhomme.setObjectName ('4')
         self.normal.setChecked(True)
         self.button_center.clicked.connect(self.startBattle)
         title_computer = QLabel("La flotte ennemie prête au combat")
@@ -99,6 +94,7 @@ class Window(QMainWindow):
         self.grid_center.addWidget(self.text_edit)
         self.grid_center.addWidget(self.button_center)
 
+        self.log('Bonjour')
         self.log('Placez vos bateaux')
         
         # PLAYER
@@ -174,24 +170,32 @@ class Window(QMainWindow):
             if self.buttons[x][y].isPlayed != True:
                 self.fight(x, y, False)
             else:
+                self.log('déjà touché ' + str(x) + ',' + str(y))
                 self.choosePlaceToFight()
 
     def precisionFight(self):
+        self.log("tir de précision")
         if self.isXactive == True:
+            self.log('isXactive ' + str(self.isXactive))
+            self.log(str(self.memoX) + str(self.iteration) + str(self.direction))
             x = self.calcNewPosition(self.memoX)
             y = self.memoY
         else:
             x = self.memoX
             y = self.calcNewPosition(self.memoY)
 
+        self.log('nouvelles coordonnées : ' + str(x) + str(y) + str(self.iteration))
         self.iteration = self.iteration + 1
         self.fight(x, y, False)
 
     def calcNewPosition(self, memo):
         xy = memo + (self.iteration * self.direction)
+        self.log('new xy = ' + str(xy))
+        self.log('gridSize = ' + str(self.gridSize))
         if xy >= self.gridSize:
             self.direction = -1
             self.iteration = 1
+            self.log('attention on risque de quitter la grille')
             xy = self.calcNewPosition(memo)
         if xy < 0:
             self.direction = 1
@@ -205,6 +209,7 @@ class Window(QMainWindow):
         button.isPlayed = True
 
         if playingOnEnemyGrid == False and self.isSinkingBoat == False:
+            self.log('on choisit au hasard une arme')
             self.activeWeapon = random.randint(0, 2)
             if self.activeWeapon == 1 and Thousand_Sunny_enemy.IsAbleToUseWeapon() == False:
                 self.activeWeapon = 0
@@ -242,15 +247,19 @@ class Window(QMainWindow):
                 self.activeWeapon = 0
                 self.normal.setChecked(True)
                 
-                if hasTouched == True :
+                if hasTouched == True:
+                    self.log ('La torpille a touché un truc')
                     if modeVerical:
                         self.fight(xy, y)
                     else:
                         self.fight(x, xy)
                     return
+                else:
+                    self.log('Echec de la torpille')
             
             # bombe
-            if self.activeWeapon == 2:
+            if self.activeWeapon == 2: 
+                self.log('Barrel ...')
                 hasTouched = False
                 xMax = x + 2 if x + 2 <= self.gridSize else self.gridSize
                 yMax = y + 2 if y + 2 <= self.gridSize else self.gridSize
@@ -289,7 +298,13 @@ class Window(QMainWindow):
                 self.barrel.setText(f"Barrel.\n {Vogue_Merry.NumberOfUse} / {Vogue_Merry_enemy.NumberOfUse}")
                 self.activeWeapon = 0
                 self.normal.setChecked(True)
+                
+                if hasTouched == True:
+                    self.log ('Barrel a touché un truc')
+                else:
+                    self.log('Echec du Barrel')
             
+
             #Le bateau est touché (colorier en rouge et affiche)
             elif button.state == True :
                 self.boatIsTouched(x, y, button, playingOnEnemyGrid)
@@ -312,14 +327,14 @@ class Window(QMainWindow):
             self.log('Placez vos bateaux !!!')
     
     def boatIsTouched(self, x, y, button, playingOnEnemyGrid):
-        self.log ("touché ")
+        self.log ("touché " + str(button.ship))
         if playingOnEnemyGrid == False:
             self.isSinkingBoat = True
             if self.memoX == 100:
                 self.memoX = x
                 self.memoY = y
         button.setStyleSheet("background-color: red")
-
+        
         # on teste si on a gagné ou perdu
         if playingOnEnemyGrid == True :
             for ship_enemy in Ships_enemy :
@@ -327,7 +342,7 @@ class Window(QMainWindow):
                     ship_enemy_name = globals()[ship_enemy['name']]
             ship_enemy_name.touched ()
             if ship_enemy_name.isShipDestroyed () == True :
-                    self.log ("vous avez détruit le "+ str(ship_enemy_name.name) + " !")
+                    self.log ("le "+ str(ship_enemy_name.name) + " a été détruit")
                     self.IsGameWon ()
         if playingOnEnemyGrid == False :
             for ship in Ships :
@@ -335,7 +350,7 @@ class Window(QMainWindow):
                     ship_name = globals()[ship['name']]
             ship_name.touched()
             if ship_name.isShipDestroyed () == True :
-                    self.log ("votre " + str(ship_name.name) + " a été détruit")
+                    self.log ("le " + str(ship_name.name) + " a été détruit")
                     self.IsGameLost ()
                 
         if playingOnEnemyGrid == False and ship_name.isShipDestroyed () == True:
@@ -347,6 +362,7 @@ class Window(QMainWindow):
             self.isXactive = True
 
     def startBattle(self):
+        self.log ('isReadyToPlay ' + str(self.isReadyToPlay))
         if self.isReadyToPlay:
             self.isBattleStarted = True
             self.grid_center.addWidget(self.weaponTitle)
@@ -356,27 +372,13 @@ class Window(QMainWindow):
             self.normal.toggled.connect(self.changeWeapon)
             self.coupdeburst.toggled.connect(self.changeWeapon)
             self.barrel.toggled.connect(self.changeWeapon)
-            self.TransformIntoLabel()  
-
-    def TransformIntoLabel(self):
-           # Parcourir les éléments du layout parent et remplacer chaque QRadioButton par un QLabel
-        for i in range(self.premierradiobutton.count()):
-            item = self.premierradiobutton.itemAt(i)
-            if item.widget() is not None and isinstance(item.widget(), QRadioButton):
-                radio_button = item.widget()
-                texte = radio_button.text()
-                label = QLabel(texte)
-                index = self.premierradiobutton.indexOf(radio_button)
-                self.premierradiobutton.takeAt(index)
-                self.premierradiobutton.insertWidget(index, label)
-                radio_button.deleteLater()
-        # Mettre à jour le layout
-        self.premierradiobutton.update()
+        self.log('isBattleStarted ' + str(self.isBattleStarted))
 
     def changeWeapon(self):
         radioButton = self.sender()
         if radioButton.isChecked():
             self.activeWeapon = int(radioButton.objectName())
+            self.log('Option sélectionnée :' +  str(radioButton.text()) + ' / ' + str(self.activeWeapon))
 
     def displayShipPlayer(self, Ship, line, isSelected = False):
         selector = QRadioButton(f"{Ship.name} ({Ship.size})")
@@ -386,12 +388,11 @@ class Window(QMainWindow):
         check_box = QCheckBox("Vertical")
         selector.toggled.connect(partial(self.bouton_toggle, selector))
         check_box.stateChanged.connect(partial(self.check_toggle, check_box, Ship))
-        self.premierradiobutton.addWidget(selector)
-        self.deuxiemecheckbox.addWidget(check_box)
-        self.grid_player.addLayout(self.inputs, line, 0, 1, 10)
-        self.inputs.addLayout(self.premierradiobutton)
-        self.inputs.addLayout(self.deuxiemecheckbox)
-        if isSelected:
+        inputs = QHBoxLayout()
+        inputs.addWidget(selector)
+        inputs.addWidget(check_box)
+        self.grid_player.addLayout(inputs, line, 0, 1, 10)
+        if (isSelected):
             self.defineActiveShip(Ship.id)
     
     def displayShipEnemy(self, Ship, line):
@@ -462,14 +463,9 @@ class Window(QMainWindow):
         button.state = True
         button.ship = Ship.id
         if (isEnemy == False) or (DEBUG == True ):
-           for Ship in Ships :
-            if Vogue_Merry.name :
-                pixmapMV = QPixmap('Vogue_Merry.jpg')
-                icon = QIcon(pixmapMV)
-                self.setGeometry(50,50,50,50)
-                button.setIcon(icon) 
-
-
+            button.setText(Ship.symbol)
+            button.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
+        
     def removeShipFromGrid(self, id):
         for x in range(self.gridSize):
             for y in range(self.gridSize):
@@ -496,29 +492,29 @@ class Window(QMainWindow):
         new_app.exec_()
     
     def IsGameWon (self) :
-        numberOfShipEnnemyDestroyed = 0
-        for shipEnnemy in Ships_enemy :
-            ship_ennemy_name = globals()[shipEnnemy['name']]
-            if ship_ennemy_name.isShipDestroyed () == True :
-                numberOfShipEnnemyDestroyed = numberOfShipEnnemyDestroyed + 1
-        print ("nombre de bateaux détruits : ", numberOfShipEnnemyDestroyed)
-        if numberOfShipEnnemyDestroyed == len (Ships_enemy) :
-            print ("Vous avez gagné !")
-            self.isEndOfTheBattle = True
+        self.log ('isGameWon ? ')
+        if self.areAllShipsDestroyed(Ships_enemy):
+            self.log ("Vous avez gagné !")
             self.grid_center.addWidget(self.winBattle)
             self.grid_center.addWidget(self.PlayAgain)
-
+    
     def IsGameLost (self) :
-        numberOfShipDestroyed = 0
-        for ship in Ships :
-            ship_name = globals()[ship['name']]
-            if ship_name.isShipDestroyed () == True :
-                numberOfShipDestroyed = numberOfShipDestroyed + 1
-        if numberOfShipDestroyed == len (Ships) :
-                print ("Vous avez perdu")
+        if self.areAllShipsDestroyed(Ships) :
+                self.log ("Vous avez perdu")
                 self.isEndOfTheBattle = True
                 self.grid_center.addWidget(self.looseBattle)
                 self.grid_center.addWidget(self.PlayAgain)
+    
+    def areAllShipsDestroyed(self, ships):
+        numbreOfShipsDestroyed = 0
+        for ship in ships:
+            ship_name = globals()[ship['name']]
+            if ship_name.isShipDestroyed () == True :
+                numbreOfShipsDestroyed = numbreOfShipsDestroyed + 1
+            if numbreOfShipsDestroyed == len(ships):
+                return True
+            else:
+                return False
         
 # les gentils
 Moby_Dick = Ship (1, "Moby Dick", 5, "red", "white", "X", None)
@@ -540,8 +536,8 @@ Ships = [
 ]
 
 #Ships = [
-#    {'id': 1, 'name': 'Moby_Dick'}, 
-#]
+#     {'id': 1, 'name': 'Moby_Dick'}, 
+#    ]
 
 Ships_enemy= [
     {'id': 1, 'name': 'Moby_Dick_enemy'}, 
@@ -553,4 +549,9 @@ Ships_enemy= [
 app = QApplication(sys.argv)
 window = Window()
 window.show()
+
 sys.exit(app.exec_())
+
+
+
+
