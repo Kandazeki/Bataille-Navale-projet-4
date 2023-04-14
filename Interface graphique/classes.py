@@ -1,3 +1,5 @@
+from PyQt5.QtGui import QTextCursor, QPixmap
+
 class Ship :
     # j'initialise le bateau en donnant son nom, sa taille, 
     # son arme, le nombre de fois qu'on peut l'utiliser et ses points de vie
@@ -11,6 +13,7 @@ class Ship :
         self.alignement = 'H'
         self.NumberOfUse = number_of_use
         self.life = self.size
+        self.image = QPixmap(self.image_path)
 
     # je diminue de 1 la vie du bateau si il est touché
     def touched (self):

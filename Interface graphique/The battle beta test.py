@@ -382,7 +382,7 @@ class Window(QMainWindow):
 
     def displayShipPlayer(self, Ship, line, isSelected = False):
         selector = QRadioButton(f"{Ship.name} ({Ship.size})")
-        selector.setStyleSheet(f"background-color: {Ship.image_path}; padding: 3px;")
+        selector.setStyleSheet(f"background-color: {Ship.image}; padding: 3px;")
         selector.setAccessibleName(str(Ship.id))
         selector.setChecked(isSelected)
         check_box = QCheckBox("Vertical")
@@ -401,7 +401,7 @@ class Window(QMainWindow):
         selector = ""
         globals()[selector] = shipSelector
         selector = QLabel(f"{Ship.name} ({Ship.size})")
-        selector.setStyleSheet(f"background-color: {Ship.image_path}; padding: 3px;")
+        selector.setStyleSheet(f"background-color: {Ship.image}; padding: 3px;")
         inputs = QHBoxLayout()
         inputs.addWidget(selector)
         self.grid_computer.addLayout(inputs, line, 0, 1, 10)
@@ -464,7 +464,7 @@ class Window(QMainWindow):
         button.state = True
         button.ship = Ship.id
         if (isEnemy == False) or (DEBUG == True ):
-            button.setStyleSheet(f"background-color: {Ship.image_path}; padding: 3px;")
+            button.setStyleSheet(f"background-color: {Ship.image}; padding: 3px;")
 
     def removeShipFromGrid(self, id):
         for x in range(self.gridSize):
@@ -516,46 +516,36 @@ class Window(QMainWindow):
                 self.grid_center.addWidget(self.looseBattle)
                 self.grid_center.addWidget(self.PlayAgain)
 
-app = QApplication(sys.argv)
+def make_ships ():
+    # les gentils
+    Moby_Dick = Ship (1, "Moby Dick", 5, "Mobydick.jpg", None)
+    Vogue_Merry = Ship (2, "Merry", 2, "Vogue_Merry.jpg", "barrel", 2)
+    Thousand_Sunny = Ship (3, "Thousand Sunny", 3, "Thousandsunny.jpg", "coup de burst", 3)
+    Toto = Ship(4, "Toto le bateau", 7, "hollandaisvolant.jpg", None)
 
-hollandaisvolant = QPixmap ("hollandaisvolant.jpg")
-Thousandsunny = QPixmap ("Thousandsunny.jpg")
-Vogue_merry = QPixmap("Vogue_Merry.jpg")
-Mobydick = QPixmap("Mobydick.jpg")
+    # les méchants
+    Moby_Dick_enemy = Ship (1, "Moby Dick", 5, "Mobydick.jpg" , None, 0)
+    Vogue_Merry_enemy = Ship (2, "Merry", 2, "Vogue_Merry.jpg ", "barrel", 2)
+    Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3,  "Thousandsunny.jpg", "coup de burst", 3)
+    Toto_enemy = Ship(4, "Toto le bateau", 7, "hollandaisvolant.jpg", None)
 
+    ships = [
+        {'id': 1, 'name': 'Moby_Dick'}, 
+        {'id': 2, 'name': 'Vogue_Merry'},
+        {'id': 3, 'name': 'Thousand_Sunny'},
+        {'id': 4, 'name': 'Toto'}
+    ]
 
-
-# les gentils
-Moby_Dick = Ship (1, "Moby Dick", 5, Mobydick, None)
-Vogue_Merry = Ship (2, "Merry", 2, Vogue_merry, "barrel", 2)
-Thousand_Sunny = Ship (3, "Thousand Sunny", 3, Thousandsunny, "coup de burst", 3)
-Toto = Ship(4, "Toto le bateau", 7, hollandaisvolant, None)
-
-# les méchants
-Moby_Dick_enemy = Ship (1, "Moby Dick", 5, Mobydick , None, 0)
-Vogue_Merry_enemy = Ship (2, "Merry", 2, Vogue_merry , "barrel", 2)
-Thousand_Sunny_enemy = Ship (3, "Thousand Sunny", 3,  Thousandsunny, "coup de burst", 3)
-Toto_enemy = Ship(4, "Toto le bateau", 7, hollandaisvolant, None)
-
-Ships = [
-    {'id': 1, 'name': 'Moby_Dick'}, 
-    {'id': 2, 'name': 'Vogue_Merry'},
-    {'id': 3, 'name': 'Thousand_Sunny'},
-    {'id': 4, 'name': 'Toto'}
-]
-
-#Ships = [
-#    {'id': 1, 'name': 'Moby_Dick'}, 
-#]
-
-Ships_enemy= [
-    {'id': 1, 'name': 'Moby_Dick_enemy'}, 
-    {'id': 2, 'name': 'Vogue_Merry_enemy'},
-    {'id': 3, 'name': 'Thousand_Sunny_enemy'},
-    {'id': 4, 'name': 'Toto_enemy'}
-]
+    ships_enemy= [
+        {'id': 1, 'name': 'Moby_Dick_enemy'}, 
+        {'id': 2, 'name': 'Vogue_Merry_enemy'},
+        {'id': 3, 'name': 'Thousand_Sunny_enemy'},
+        {'id': 4, 'name': 'Toto_enemy'}
+    ]
+    return ships, ships_enemy, Moby_Dick, Moby_Dick_enemy, Vogue_Merry, Vogue_Merry_enemy, Thousand_Sunny,Thousand_Sunny_enemy,Toto, Toto_enemy
 
 app = QApplication(sys.argv)
 window = Window()
 window.show()
+Ships, Ships_enemy, Moby_Dick, Moby_Dick_enemy, Vogue_Merry, Vogue_Merry_enemy,Thousand_Sunny,Thousand_Sunny_enemy,Toto, Toto_enemy= make_ships ()
 sys.exit(app.exec_())
