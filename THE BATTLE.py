@@ -9,8 +9,7 @@ import datetime
 import json
 from classes import *
 
-#Apparition des bateaux adverses
-
+#Apparition des bateaux adverses pour pouvoir débuguer si besoin
 DEBUG = False
 
 #Création d'une fenetre principale
@@ -75,7 +74,7 @@ class Window(QMainWindow):
                 row.append(button)
             self.buttons_enemy.append(row)
         
-        #Mise en place de l'interface graphique tout les labels et bouton qui apparaissent
+        # Mise en place de l'interface graphique tout les labels et bouton qui apparaissent
 
         self.spacer = QLabel ('')
         title_player = QLabel("Votre flotte :")
@@ -107,7 +106,7 @@ class Window(QMainWindow):
         self.grid_center.addWidget(self.button_center)
         self.log('Placez vos bateaux')
         
-        ##Frame et Widgets associés à leur utilisateur
+        ## Frame et Widgets associés à leur utilisateur
         # PLAYER
         frame_player = QFrame()
         frame_player.setFixedSize(500, 600)
@@ -163,7 +162,7 @@ class Window(QMainWindow):
                 self.btnGridSelected(x, y, myShip, True)
             i = i + 1
     
-    #Affichage de messages curseurs       
+    #Affichage de messages curseurs au centre 
     def log(self, message):
         message = str(message)
         self.text_edit.moveCursor(QTextCursor.End)
@@ -172,7 +171,7 @@ class Window(QMainWindow):
         self.text_edit.ensureCursorVisible()
 
     #Définition des endroits où le bateau enemi peut attaquer c'est aléatoire
-    def choosePlaceToFight(self):
+    def choosePlaceToFight(self) :
         if self.isSinkingBoat == True:
             self.precisionFight()
         else:    
@@ -183,7 +182,7 @@ class Window(QMainWindow):
             else:
                 self.choosePlaceToFight()
 
-    #On retient les endroits où un canon a été tiré
+    #On retient les endroits où on a tiré et touché un bateau
     def precisionFight(self):
         if self.isXactive == True:
             x = self.calcNewPosition(self.memoX)
@@ -194,7 +193,7 @@ class Window(QMainWindow):
         self.iteration = self.iteration + 1
         self.fight(x, y, False)
 
-    #Puis on retire en les évitant
+    #Puis on retire à côté de l'emplacement trouvé
     def calcNewPosition(self, memo):
         xy = memo + (self.iteration * self.direction)
         if xy >= self.gridSize:
@@ -260,7 +259,7 @@ class Window(QMainWindow):
             # définition des effets du Barrel
             if self.activeWeapon == 2:
                 hasTouched = False
-                #On détermine deans quel cadre on peut toucher
+                #On détermine dans quel cadre on peut toucher
                 xMax = x + 2 if x + 2 <= self.gridSize else self.gridSize
                 yMax = y + 2 if y + 2 <= self.gridSize else self.gridSize
                 #Vérification qu'on joue sur la grille ennemie
@@ -316,12 +315,13 @@ class Window(QMainWindow):
                         self.isXactive = False
                         self.iteration = 1
                         self.direction = 1
-            #Si la variable est fausse on demande a placer les bateaux       
+            #C'est ensuite au tour de l'ennemi       
             if playingOnEnemyGrid == True:
                 self.choosePlaceToFight()
         else:
             self.log('Placez vos bateaux !!!')
-    #On défint un bateau touché
+
+    #On définit les actions à faire quand un bateau est touché
     def boatIsTouched(self, x, y, button, playingOnEnemyGrid) :
         self.log ("touché ")
         if playingOnEnemyGrid == False:
@@ -473,7 +473,7 @@ class Window(QMainWindow):
         else:
             self.button_center.setText('Embarquement ...')       
     
-    #On vérifie si on affiche ou non les bateaux ennemis:
+    #On vérifie si on affiche ou non les bateaux alliés:
     #Oui
     def displayShipOnGrid(self, x, y, Ship, isEnemy = False):
         buttons = self.buttons if isEnemy == False else self.buttons_enemy
@@ -483,7 +483,7 @@ class Window(QMainWindow):
         if isEnemy == False or DEBUG == True :
             button.setText(Ship.symbol)
             button.setStyleSheet(f"background-color: {Ship.color}; color: {Ship.textColor}; padding: 3px;")
-    #Non  
+    # on déplace un bateau donc on commence par le déplacer
     def removeShipFromGrid(self, id):
         for x in range(self.gridSize):
             for y in range(self.gridSize):
