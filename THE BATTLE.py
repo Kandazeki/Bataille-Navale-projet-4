@@ -101,7 +101,7 @@ class Window(QMainWindow):
         
         # PLAYER
         frame_player = QFrame()
-        frame_player.setFixedSize(500, 600)
+        frame_player.setFixedSize(700, 900)
         frame_player.setLayout(self.grid_player)
         frame_player.setLayout(self.grid_player)
         title = QHBoxLayout()
@@ -109,11 +109,11 @@ class Window(QMainWindow):
         self.grid_player.addLayout(title, self.gridSize+1, 0, 1, 10)
         # CENTER
         frame_center = QFrame()
-        frame_center.setFixedSize(220, 500)
+        frame_center.setFixedSize(300, 600)
         frame_center.setLayout(self.grid_center)
         # COMPUTER
         frame_computer = QFrame()
-        frame_computer.setFixedSize(500, 600)
+        frame_computer.setFixedSize(700, 900)
         frame_computer.setLayout(self.grid_computer)
         title = QHBoxLayout()
         title.addWidget(title_computer)
